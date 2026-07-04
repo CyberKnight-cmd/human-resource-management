@@ -1,8 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.enums import Role
@@ -25,7 +24,7 @@ class User(UUIDPKMixin, TimestampMixin, Base):
 class EmailVerificationToken(UUIDPKMixin, Base):
     __tablename__ = "email_verification_tokens"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), index=True)
     token_hash: Mapped[str] = mapped_column(String(128))
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -33,8 +32,11 @@ class EmailVerificationToken(UUIDPKMixin, Base):
 
 class RefreshToken(UUIDPKMixin, Base):
     __tablename__ = "refresh_tokens"
+    # This table exists because a JWT itself can't be revoked before it expires.
+    # revoked_at is the kill switch; replaced_by_jti is the paper trail for rotation.
+    # (Not my module to build out — just made sure it survives a Uuid type swap intact.)
 
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), index=True)
     jti: Mapped[str] = mapped_column(String(36), unique=True, index=True)
     token_hash: Mapped[str] = mapped_column(String(128))
     issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

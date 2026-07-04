@@ -41,7 +41,10 @@ class ConflictError(AppError):
 class ValidationConflictError(AppError):
     """Business-rule validation failure (e.g. insufficient leave balance, overlapping dates)."""
 
-    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    # Yes, it's really named UNPROCESSABLE_CONTENT now, not UNPROCESSABLE_ENTITY.
+    # The old name still works but nags with a deprecation warning on every single
+    # request — updated it before it turned into background noise nobody reads.
+    status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
     code = "VALIDATION_CONFLICT"
 
 

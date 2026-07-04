@@ -10,5 +10,17 @@ AsyncSessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False, auto
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """One session per request = one transaction per request: commits only if the
+    route handler completes without raising, rolls back otherwise. Services never
+    call commit()/rollback() themselves — that would let a partial write from one
+    layer leak past an error raised by another."""
     async with AsyncSessionLocal() as session:
-        yield session
+        try:
+            yield session
+            # If we got here, the handler didn't throw — safe to make it permanent.
+            await session.commit()
+        except Exception:
+            # Something upstream blew up. Whatever half-written rows are sitting in
+            # this session die here, not in the database.
+            await session.rollback()
+            raise

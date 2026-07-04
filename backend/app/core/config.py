@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     # Storage
     UPLOAD_DIR: str = "uploads"
 
+    # Attendance
+    # The line between "showed up" and "showed up-ish". If HR ever wants to argue
+    # about what counts as a half day, this is the number they actually want to change —
+    # not a hardcoded 4 buried three files deep in the service.
+    HALF_DAY_THRESHOLD_HOURS: float = 4.0
+
 
 @lru_cache
 def get_settings() -> Settings:

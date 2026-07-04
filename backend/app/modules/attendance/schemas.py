@@ -15,3 +15,12 @@ class AttendanceOut(BaseModel):
     status: AttendanceStatus
 
     model_config = {"from_attributes": True}
+
+
+class AttendanceSummaryOut(BaseModel):
+    """Day counts for a range — the shape Payroll/salary calculations consume directly."""
+
+    present: int
+    absent: int
+    half_day: int
+    leave: int
