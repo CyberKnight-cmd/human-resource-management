@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aether HR | Authenticate</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/css?f[]=geist@1,200,300,400,500,600,700,800,900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#e1e0ff",
+                    "on-secondary-fixed": "#07006c",
+                    "surface-bright": "#31394d",
+                    "error-container": "#93000a",
+                    "primary-fixed": "#86f7d4",
+                    "surface-container": "#171f33",
+                    "secondary-fixed-dim": "#c0c1ff",
+                    "on-error": "#690005",
+                    "surface-tint": "#68dab9",
+                    "tertiary-fixed": "#ffd8e7",
+                    "on-primary": "#00382b",
+                    "on-background": "#dae2fd",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#68dab9",
+                    "outline-variant": "#3d4944",
+                    "surface-container-lowest": "#060e20",
+                    "on-secondary": "#1000a9",
+                    "background": "#0b1326",
+                    "error": "#ffb4ab",
+                    "outline": "#87948e",
+                    "on-surface": "#dae2fd",
+                    "on-tertiary-fixed": "#3d0026",
+                    "secondary": "#c0c1ff",
+                    "surface-dim": "#0b1326",
+                    "on-secondary-container": "#b0b2ff",
+                    "on-primary-container": "#00372a",
+                    "inverse-surface": "#dae2fd",
+                    "tertiary": "#ffafd3",
+                    "surface-container-low": "#131b2e",
+                    "secondary-container": "#3131c0",
+                    "tertiary-container": "#ea6aad",
+                    "tertiary-fixed-dim": "#ffafd3",
+                    "primary": "#68dab9",
+                    "surface-container-high": "#222a3d",
+                    "surface": "#0b1326",
+                    "on-surface-variant": "#bccac3",
+                    "on-secondary-fixed-variant": "#2f2ebe",
+                    "surface-variant": "#2d3449",
+                    "primary-container": "#2fa98a",
+                    "on-tertiary-container": "#60003f",
+                    "on-primary-fixed-variant": "#00513f",
+                    "on-primary-fixed": "#002118",
+                    "inverse-primary": "#006b55",
+                    "on-tertiary": "#620040",
+                    "surface-container-highest": "#2d3449",
+                    "inverse-on-surface": "#283044",
+                    "on-tertiary-fixed-variant": "#85145a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-gap": "48px",
+                    "container-padding": "24px",
+                    "unit": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Geist"],
+                    "display-xl": ["Geist"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Geist"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-xl": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>body {
+    background-color: #0b1326;
+    color: #dae2fd;
+    overflow: hidden
+    }
+.noise-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDkCXMpR115wJdANJR2njf-gZbgNuqX4ULEhcYCyCOB3-TK7afSwLxtLmA0ukFAFeeqgm5bNHl5VPrkzM_Uw-CZ7Ds6Oo6fxGU4rGG-RZCM4njv_g0mvPNfWxM7c__kD4uWYtm7_zHrIEVj3F_C6CGAOdADD_XIUK5yObTt9LnxEZlGRqgX3dOSlocOpwzVh70kpq7m6r9jbYYopCzVv8GisYlogRBgk-04xibPeuVO0TklQEoSZoSh_eZoNYX4HE32A9DB8llKaRo);
+    opacity: 0.03;
+    pointer-events: none
+    }
+.glass-card {
+    backdrop-filter: blur(16px);
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5)
+    }
+.input-glow:focus-within {
+    box-shadow: 0 0 15px rgba(104, 218, 185, 0.2);
+    border-bottom-color: #68dab9
+    }
+.strength-bar {
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease
+    }
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+        } 50% {
+        transform: translateY(-10px);
+        }
+    }
+.animate-float {
+    animation: float 6s ease-in-out infinite
+    }
+.magnetic-btn {
+    transition: transform 0.2s cubic-bezier(0.33, 1, 0.68, 1)
+    }
+/* Verification Success Animation */
+.verification-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s ease
+    }
+.verification-active .verification-overlay {
+    opacity: 1;
+    pointer-events: auto;
+    backdrop-filter: blur(24px)
+    }</style>
+</head>
+<body class="font-body-md text-body-md antialiased">
+<!-- Background Elements -->
+<div class="fixed inset-0 noise-overlay z-[100]"></div>
+<main class="flex min-h-screen w-full relative overflow-hidden">
+<!-- Left Section: Auth Form -->
+<section class="relative w-full lg:w-2/5 flex flex-col justify-center items-center p-8 lg:p-16 z-10 bg-background/40">
+<!-- Brand Logo -->
+<div class="absolute top-10 left-10 flex items-center gap-2 group cursor-pointer">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(104,218,185,0.4)]">
+<span class="material-symbols-outlined text-on-primary font-bold">blur_on</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tighter">Aether HR</span>
+</div>
+<!-- Auth Container -->
+<div class="glass-card w-full max-w-md p-10 rounded-2xl relative overflow-hidden group" id="auth-container">
+<!-- Email Verification State (Hidden by default) -->
+<div class="absolute inset-0 bg-surface-container/90 flex flex-col items-center justify-center p-10 text-center opacity-0 pointer-events-none transition-all duration-700 translate-y-full" id="success-screen">
+<div class="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mb-6 animate-pulse">
+<span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Check your inbox</h2>
+<p class="text-on-surface-variant font-body-md mb-8">We've sent a magic link to <span class="text-on-surface font-bold" id="display-email">admin@aethercorp.com</span>. Click the link to securely log in.</p>
+<button class="text-primary font-label-sm uppercase hover:underline" onclick="toggleSuccess(false)">Back to sign in</button>
+</div>
+<!-- Form Content -->
+<div id="form-content">
+<div class="mb-10">
+<h1 class="font-headline-lg text-headline-lg mb-2 text-on-surface">Welcome Back</h1>
+<p class="text-on-surface-variant">Sign in to manage your high-performance workspace.</p>
+</div>
+<!-- Role Toggle -->
+<div class="flex p-1 bg-surface-variant rounded-xl mb-8">
+<button class="flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 bg-primary/10 text-primary shadow-sm" id="toggle-employee" onclick="setRole('employee')">EMPLOYEE</button>
+<button class="flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 text-on-surface-variant hover:text-on-surface" id="toggle-hr" onclick="setRole('hr')">HR ADMIN</button>
+</div>
+<form class="space-y-6" onsubmit="handleSignIn(event)">
+<!-- Employee ID -->
+<div class="space-y-2 group">
+<label class="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors">EMPLOYEE ID</label>
+<div class="relative flex items-center border-b border-white/10 input-glow transition-all py-2">
+<span class="material-symbols-outlined text-on-surface-variant mr-3 text-lg">badge</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-on-surface-variant/30 font-label-sm" placeholder="AE-102934" required="" type="text"/>
+</div>
+</div>
+<!-- Email -->
+<div class="space-y-2 group">
+<label class="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors">WORK EMAIL</label>
+<div class="relative flex items-center border-b border-white/10 input-glow transition-all py-2">
+<span class="material-symbols-outlined text-on-surface-variant mr-3 text-lg">mail</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-on-surface-variant/30 font-body-md" id="email-input" placeholder="name@aethercorp.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password -->
+<div class="space-y-2 group">
+<div class="flex justify-between items-end">
+<label class="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors">PASSWORD</label>
+<a class="text-[11px] text-primary/60 hover:text-primary transition-colors" href="#">Forgot?</a>
+</div>
+<div class="relative flex items-center border-b border-white/10 input-glow transition-all py-2">
+<span class="material-symbols-outlined text-on-surface-variant mr-3 text-lg">lock</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-on-surface-variant/30 font-body-md" id="password-input" oninput="updateStrength(this.value)" placeholder="••••••••" required="" type="password"/>
+</div>
+<!-- Strength Meter -->
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden mt-3">
+<div class="h-full strength-bar w-0 bg-error" id="strength-meter"></div>
+</div>
+<div class="text-[10px] font-label-sm text-on-surface-variant/50 uppercase tracking-widest pt-1" id="strength-text">Too short</div>
+</div>
+<div class="pt-4">
+<button class="magnetic-btn w-full py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 group hover:shadow-[0_0_30px_rgba(104,218,185,0.3)] transition-all active:scale-95 border-t border-white/20" type="submit">
+                                SIGN IN TO AETHER
+                                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</form>
+<div class="mt-8 text-center">
+<p class="text-on-surface-variant font-body-md">Don't have an account? <a class="text-primary font-bold hover:underline" href="#">Contact HR</a></p>
+</div>
+</div>
+</div>
+<!-- Support Footer -->
+<div class="absolute bottom-10 left-10 flex gap-6">
+<a class="font-label-sm text-label-sm text-on-surface-variant/60 hover:text-primary transition-colors" href="#">PRIVACY</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant/60 hover:text-primary transition-colors" href="#">SECURITY</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant/60 hover:text-primary transition-colors" href="#">SUPPORT</a>
+</div>
+</section>
+<!-- Right Section: Hero Scene -->
+<section class="hidden lg:flex relative w-3/5 bg-surface-container-lowest overflow-hidden">
+<!-- Shader Background -->
+<!-- STITCH_SHADER_START:ANIMATION_1 class="absolute inset-0 w-full h-full opacity-60" -->
+<div class="absolute inset-0 w-full h-full opacity-60" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_1" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_1');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+varying vec2 v_texCoord;
+
+vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+float snoise(vec2 v) {
+    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+    vec2 i  = floor(v + dot(v, C.yy) );
+    vec2 x0 = v -   i + dot(i, C.xx);
+    vec2 i1;
+    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+    i = mod289(i);
+    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+    m = m*m ;
+    m = m*m ;
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 a0 = x - floor(x + 0.5);
+    float m0 = 1.0 - 2.0 * ( a0.x*a0.x + h.x*h.x );
+    float m1 = 1.0 - 2.0 * ( a0.y*a0.y + h.y*h.y );
+    float m2 = 1.0 - 2.0 * ( a0.z*a0.z + h.z*h.z );
+    vec3 g;
+    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+    return 130.0 * dot(m, g);
+}
+
+void main() {
+    vec2 uv = v_texCoord;
+    
+    // Animated Mesh Gradient
+    vec3 color1 = vec3(0.02, 0.05, 0.15); // Midnight Navy
+    vec3 color2 = vec3(0.15, 0.1, 0.4);  // Indigo
+    vec3 color3 = vec3(0.18, 0.66, 0.54); // Soft Teal
+    
+    float n = snoise(uv * 2.0 + u_time * 0.1);
+    float n2 = snoise(uv * 3.0 - u_time * 0.05);
+    
+    vec3 color = mix(color1, color2, 0.5 + 0.5 * n);
+    color = mix(color, color3, 0.3 + 0.3 * n2);
+    
+    // Add subtle grain/noise
+    float grain = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);
+    color += grain * 0.02;
+    
+    gl_FragColor = vec4(color, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_1 -->
+<!-- Three.js Floating Elements -->
+<!-- STITCH_THREEJS_START:ANIMATION_2 class="absolute inset-0 w-full h-full z-10" -->
+<div class="absolute inset-0 w-full h-full z-10" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_2" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_2');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(width, height);
+container.appendChild(renderer.domElement);
+
+// Create a glass-like floating blob
+const geometry = new THREE.IcosahedronGeometry(2, 4);
+const material = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.3,
+    shininess: 100,
+    reflectivity: 1,
+    flatShading: false
+});
+
+const blob = new THREE.Mesh(geometry, material);
+scene.add(blob);
+
+// Add wireframe overlay for tech look
+const wireframe = new THREE.WireframeGeometry(geometry);
+const lineMaterial = new THREE.LineBasicMaterial({ color: 0x2FA98A, transparent: true, opacity: 0.2 });
+const line = new THREE.LineSegments(wireframe, lineMaterial);
+blob.add(line);
+
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 5, 5);
+scene.add(light);
+scene.add(new THREE.AmbientLight(0x404040));
+
+camera.position.z = 8;
+
+function animate() {
+    requestAnimationFrame(animate);
+    blob.rotation.x += 0.005;
+    blob.rotation.y += 0.005;
+    blob.position.y = Math.sin(Date.now() * 0.001) * 0.5;
+    renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+});
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_2 -->
+<!-- Text Overlay -->
+<div class="relative z-20 w-full h-full flex flex-col justify-end p-20 bg-gradient-to-t from-background via-transparent to-transparent">
+<div class="max-w-2xl translate-y-10 opacity-0 animate-[fadeUp_1s_ease-out_forwards]">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6 backdrop-blur-md">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-primary tracking-widest">SYSTEM STATUS: OPTIMAL</span>
+</div>
+<h1 class="font-display-xl text-display-xl text-on-surface mb-6 leading-tight">
+                        Every workday, <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary-fixed to-secondary">perfectly aligned.</span>
+</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-lg mb-8 leading-relaxed">
+                        Aether HR orchestrates your entire organization's lifecycle with atmospheric precision and computational elegance.
+                    </p>
+<!-- Stats Floating Cards -->
+<div class="flex gap-4">
+<div class="glass-card p-4 rounded-xl flex items-center gap-4 animate-float" style="animation-delay: 0s;">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<div>
+<div class="font-label-sm text-on-surface-variant">ACTIVE TEAMS</div>
+<div class="font-headline-md text-on-surface">1,204</div>
+</div>
+</div>
+<div class="glass-card p-4 rounded-xl flex items-center gap-4 animate-float" style="animation-delay: 1.5s;">
+<div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">flash_on</span>
+</div>
+<div>
+<div class="font-label-sm text-on-surface-variant">EFFICIENCY</div>
+<div class="font-headline-md text-on-surface">98.2%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Abstract light orb -->
+<div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-primary/10 blur-[150px] rounded-full pointer-events-none"></div>
+</section>
+</main>
+<script>
+        // Magnetic button effect
+        const btn = document.querySelector('.magnetic-btn');
+        if(btn) {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = `translate(0, 0)`;
+            });
+        }
+
+        // Strength meter logic
+        function updateStrength(val) {
+            const meter = document.getElementById('strength-meter');
+            const text = document.getElementById('strength-text');
+            
+            if (val.length === 0) {
+                meter.style.width = '0%';
+                text.innerText = 'Too short';
+                meter.className = 'h-full strength-bar bg-error';
+            } else if (val.length < 6) {
+                meter.style.width = '25%';
+                text.innerText = 'Weak';
+                meter.className = 'h-full strength-bar bg-error';
+            } else if (val.length < 10) {
+                meter.style.width = '60%';
+                text.innerText = 'Medium';
+                meter.className = 'h-full strength-bar bg-tertiary-container';
+            } else {
+                meter.style.width = '100%';
+                text.innerText = 'Strong Precision';
+                meter.className = 'h-full strength-bar bg-primary';
+            }
+        }
+
+        // Role toggle logic
+        function setRole(role) {
+            const empBtn = document.getElementById('toggle-employee');
+            const hrBtn = document.getElementById('toggle-hr');
+            
+            if (role === 'employee') {
+                empBtn.className = 'flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 bg-primary/10 text-primary shadow-sm';
+                hrBtn.className = 'flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 text-on-surface-variant hover:text-on-surface';
+            } else {
+                hrBtn.className = 'flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 bg-primary/10 text-primary shadow-sm';
+                empBtn.className = 'flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 text-on-surface-variant hover:text-on-surface';
+            }
+        }
+
+        // Form Submission / Success state
+        function handleSignIn(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('email-input').value;
+            document.getElementById('display-email').innerText = emailInput;
+            toggleSuccess(true);
+        }
+
+        function toggleSuccess(show) {
+            const success = document.getElementById('success-screen');
+            const form = document.getElementById('form-content');
+            
+            if (show) {
+                success.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+                form.classList.add('opacity-0', 'scale-95');
+                success.classList.add('translate-y-0', 'opacity-100');
+            } else {
+                success.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+                form.classList.remove('opacity-0', 'scale-95');
+                success.classList.remove('translate-y-0', 'opacity-100');
+            }
+        }
+
+        // Custom Keyframes
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeUp {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body></html>
