@@ -52,12 +52,13 @@ class LeaveRequestRepository(BaseRepository[LeaveRequest]):
         )
         return list((await self._db.execute(stmt)).scalars().all())
 
-    async def list_for_employee(self, employee_id: uuid.UUID, page: PageParams) -> tuple[list[LeaveRequest], int]:
-        stmt = (
-            select(LeaveRequest)
-            .where(LeaveRequest.employee_id == employee_id)
-            .order_by(LeaveRequest.created_at.desc())
-        )
+    async def list_for_employee(
+        self, employee_id: uuid.UUID, page: PageParams, status: LeaveStatus | None = None
+    ) -> tuple[list[LeaveRequest], int]:
+        stmt = select(LeaveRequest).where(LeaveRequest.employee_id == employee_id)
+        if status is not None:
+            stmt = stmt.where(LeaveRequest.status == status)
+        stmt = stmt.order_by(LeaveRequest.created_at.desc())
         rows, total = await paginate(self._db, stmt, page)
         return list(rows), total
 

@@ -77,6 +77,21 @@ class AttendanceRepository(BaseRepository[AttendanceRecord]):
         counts.update(dict(rows))
         return counts
 
+    async def get_summary_for_all(self, on_date: date) -> dict[AttendanceStatus, int]:
+        """Same GROUP BY shape as get_summary(), just without the employee_id filter —
+        this is the org-wide "how's today looking" snapshot the admin dashboard wants,
+        not a per-employee number. Zero-filled the same way, for the same reason."""
+        stmt = (
+            select(AttendanceRecord.status, func.count())
+            .where(AttendanceRecord.date == on_date)
+            .group_by(AttendanceRecord.status)
+        )
+        rows = (await self._db.execute(stmt)).all()
+
+        counts = {status: 0 for status in AttendanceStatus}
+        counts.update(dict(rows))
+        return counts
+
     async def mark_range_as_leave(self, employee_id: uuid.UUID, start_date: date, end_date: date) -> None:
         """Called by Leave the moment a request gets approved — every day in the range
         becomes an attendance row with status=LEAVE, overwriting whatever was there

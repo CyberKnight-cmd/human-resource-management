@@ -1,7 +1,12 @@
 /* ========================
-   CSS Custom Properties
+   Tailwind v4 theme tokens
+   ------------------------
+   These MUST live inside @theme (not a plain :root block) or Tailwind
+   never generates the corresponding utilities (bg-primary, text-on-surface,
+   gap-gutter, stroke-primary, etc. all silently no-op otherwise — every
+   custom-named utility in every page depends on this block existing here).
    ======================== */
-:root {
+@theme {
   /* Material You Color Tokens */
   --color-primary: #68dab9;
   --color-on-primary: #00382b;
@@ -58,12 +63,43 @@
   --color-inverse-surface: #dae2fd;
   --color-inverse-on-surface: #283044;
 
-  /* Spacing */
+  /* Spacing (gap-gutter, p-container-padding, mb-section-gap, etc.) */
   --spacing-section-gap: 48px;
   --spacing-container-padding: 24px;
   --spacing-unit: 4px;
   --spacing-gutter: 16px;
 
+  /* Font sizes (text-label-sm, text-body-md, text-headline-lg, etc.) */
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 1;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.5;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.3;
+  --text-headline-lg: 40px;
+  --text-headline-lg--line-height: 1.2;
+  --text-display-xl: 64px;
+  --text-display-xl--line-height: 1.1;
+
+  /* Font families (font-label-sm, font-body-md, font-headline-lg, etc.) */
+  --font-label-sm: 'JetBrains Mono', monospace;
+  --font-body-md: 'Inter', sans-serif;
+  --font-body-lg: 'Inter', sans-serif;
+  --font-headline-md: 'Geist', sans-serif;
+  --font-headline-lg: 'Geist', sans-serif;
+  --font-display-xl: 'Geist', sans-serif;
+}
+
+/* ========================
+   CSS Custom Properties
+   ------------------------
+   Fine-grained typography knobs (weight/letter-spacing per scale) consumed
+   directly by the .font-* utility classes below — not Tailwind-generated,
+   so a plain :root block is correct here.
+   ======================== */
+:root {
   /* Border Radius */
   --radius: 4px;
   --radius-lg: 8px;
@@ -228,7 +264,7 @@ body {
 
 .glass-panel:hover {
   border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-4px) scale(1.02);
+  transform: scale(1.005);
   box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
 }
 
@@ -297,7 +333,8 @@ body {
 
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-stagger-in {
+.animate-stagger-in,
+.stagger-in {
   opacity: 0;
   transform: translateY(20px);
   animation: staggerIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;

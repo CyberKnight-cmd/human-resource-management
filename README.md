@@ -84,7 +84,7 @@ Full design docs live in [`Architecture/`](Architecture):
 | Auth | JWT (`python-jose`) — short-lived access token, rotating/revocable refresh token — `passlib[bcrypt]` for hashing |
 | Validation | Pydantic v2 |
 | Containerization | Docker + Docker Compose |
-| Frontend *(planned)* | React / Next.js consuming the REST API over HTTPS |
+| Frontend | React 19 + Vite + Tailwind CSS, consuming the REST API over HTTP |
 
 ## Repository Structure
 
@@ -99,6 +99,8 @@ Full design docs live in [`Architecture/`](Architecture):
 │       ├── common/        # enums, pagination, audit logging
 │       └── modules/       # auth · users · attendance · leave · payroll · dashboard
 │           └── <module>/  # schemas.py · repository.py · service.py · router.py
+├── frontend/
+│   └── src/               # React app (pages, router, API client) — Vite + Tailwind
 └── docs/assets/           # README banner, future screenshots/video
 ```
 
@@ -134,6 +136,21 @@ That's the whole setup — **no database server, no Docker, no manual Python/ven
 - Run the test suite: `uv run pytest`
 
 To switch to real Postgres later: uncomment the `postgresql+asyncpg://...` line in `.env`, then `docker-compose up -d db` and `alembic upgrade head` once migrations exist.
+
+### Frontend
+
+**Prerequisite:** [Node.js](https://nodejs.org/) 20+.
+
+In a separate terminal, with the backend already running on `http://localhost:8000`:
+
+```bash
+cd frontend
+cp .env.example .env            # points VITE_API_URL at the backend — defaults already work for local dev
+npm install
+npm run dev                     # → http://localhost:5173
+```
+
+The backend's `CORS_ORIGINS` already allows `http://localhost:5173`, so no extra config is needed to talk to it locally.
 
 ## Roadmap
 

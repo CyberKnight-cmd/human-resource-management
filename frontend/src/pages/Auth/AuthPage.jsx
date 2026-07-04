@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import ShaderBackground from '../../components/background/ShaderBackground';
 import FloatingGlassBlob from '../../components/background/FloatingGlassBlob';
 import NoiseOverlay from '../../components/common/NoiseOverlay';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const [role, setRole] = useState('employee'); // 'employee' | 'hr'
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [employeeId, setEmployeeId] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [strength, setStrength] = useState({ text: 'Too short', width: '0%', colorClass: 'bg-error' });
 
   const magneticBtnRef = useRef(null);
@@ -33,17 +35,25 @@ export default function AuthPage() {
     updateStrength(val);
   };
 
-  const handleSignIn = (e) => {
+  const [loggedInRole, setLoggedInRole] = useState(null);
+
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    setShowSuccess(true);
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const user = await login(email, password);
+      setLoggedInRole(user.role);
+      setShowSuccess(true);
+    } catch (err) {
+      setError(err.message || 'Invalid email or password');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const proceedToDashboard = () => {
-    if (role === 'hr') {
-      navigate('/admin');
-    } else {
-      navigate('/employee');
-    }
+    navigate(loggedInRole === 'admin' ? '/admin' : '/employee');
   };
 
   useEffect(() => {
@@ -95,12 +105,12 @@ export default function AuthPage() {
             }`}>
               <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mb-6 animate-pulse">
                 <span className="material-symbols-outlined text-primary text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  mark_email_read
+                  verified
                 </span>
               </div>
-              <h2 className="font-headline-md text-headline-md text-primary mb-2">Check your inbox</h2>
+              <h2 className="font-headline-md text-headline-md text-primary mb-2">You're signed in</h2>
               <p className="text-on-surface-variant font-body-md mb-8">
-                We've sent a magic link to <span className="text-on-surface font-bold">{email || 'admin@aethercorp.com'}</span>. Click the link to securely log in.
+                Welcome back, <span className="text-on-surface font-bold">{email}</span>. Your workspace is ready.
               </p>
               
               <button 
@@ -126,47 +136,7 @@ export default function AuthPage() {
                 <p class="text-on-surface-variant">Sign in to manage your high-performance workspace.</p>
               </div>
 
-              {/* Role Toggle */}
-              <div className="flex p-1 bg-surface-variant rounded-xl mb-8">
-                <button 
-                  type="button"
-                  className={`flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 cursor-pointer border-none ${
-                    role === 'employee' ? 'bg-primary/10 text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface bg-transparent'
-                  }`} 
-                  onClick={() => setRole('employee')}
-                >
-                  EMPLOYEE
-                </button>
-                <button 
-                  type="button"
-                  className={`flex-1 py-2 rounded-lg font-label-sm text-label-sm transition-all duration-300 cursor-pointer border-none ${
-                    role === 'hr' ? 'bg-primary/10 text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface bg-transparent'
-                  }`} 
-                  onClick={() => setRole('hr')}
-                >
-                  HR ADMIN
-                </button>
-              </div>
-
               <form className="space-y-6" onSubmit={handleSignIn}>
-                {/* Employee ID */}
-                <div className="space-y-2 group">
-                  <label className="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors">
-                    EMPLOYEE ID
-                  </label>
-                  <div className="relative flex items-center border-b border-white/10 input-glow transition-all py-2">
-                    <span className="material-symbols-outlined text-on-surface-variant mr-3 text-lg">badge</span>
-                    <input 
-                      className="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-on-surface-variant/30 font-label-sm outline-none" 
-                      placeholder="AE-102934" 
-                      required 
-                      type="text"
-                      value={employeeId}
-                      onChange={(e) => setEmployeeId(e.target.value)}
-                    />
-                  </div>
-                </div>
-
                 {/* Email */}
                 <div className="space-y-2 group">
                   <label className="font-label-sm text-label-sm text-on-surface-variant group-focus-within:text-primary transition-colors">
@@ -214,13 +184,20 @@ export default function AuthPage() {
                   </div>
                 </div>
 
+                {error && (
+                  <p className="text-error text-[13px] font-body-md -mt-2" role="alert">
+                    {error}
+                  </p>
+                )}
+
                 <div className="pt-4">
-                  <button 
+                  <button
                     ref={magneticBtnRef}
-                    className="magnetic-btn w-full py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 group hover:shadow-[0_0_30px_rgba(104,218,185,0.3)] transition-all active:scale-95 border-t border-white/20 cursor-pointer" 
+                    disabled={isSubmitting}
+                    className="magnetic-btn w-full py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 group hover:shadow-[0_0_30px_rgba(104,218,185,0.3)] transition-all active:scale-95 border-t border-white/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     type="submit"
                   >
-                    SIGN IN TO AETHER
+                    {isSubmitting ? 'SIGNING IN…' : 'SIGN IN TO AETHER'}
                     <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </button>
                 </div>

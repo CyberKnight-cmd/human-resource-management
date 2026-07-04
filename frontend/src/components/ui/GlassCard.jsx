@@ -1,11 +1,11 @@
 import React from 'react';
 
-export default function GlassCard({ children, className = '', onClick, style = {} }) {
+export default function GlassCard({ children, className = '', onClick, style = {}, rounded = 'rounded-3xl' }) {
   return (
     <div
       onClick={onClick}
       style={style}
-      className={`glass-panel rounded-3xl p-6 transition-all duration-300 ${className} ${onClick ? 'cursor-pointer' : ''}`}
+      className={`glass-panel ${rounded} p-6 transition-all duration-300 ${className} ${onClick ? 'cursor-pointer' : ''}`}
     >
       {children}
     </div>

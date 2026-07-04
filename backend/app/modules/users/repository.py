@@ -1,8 +1,9 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.common.base_repository import BaseRepository
+from app.common.pagination import PageParams, paginate
 from app.models.employee import Employee
 
 
@@ -15,5 +16,11 @@ class EmployeeRepository(BaseRepository[Employee]):
         stmt = select(Employee).where(Employee.user_id == user_id)
         return (await self._db.execute(stmt)).scalar_one_or_none()
 
-    # TODO(Srijan): list_paginated(), update_fields() — profile view/edit business logic.
-    # Borrowed your model for one method, promise I'll leave the rest alone.
+    async def list_paginated(self, page: PageParams) -> tuple[list[Employee], int]:
+        stmt = select(Employee).order_by(Employee.last_name, Employee.first_name)
+        rows, total = await paginate(self._db, stmt, page)
+        return list(rows), total
+
+    async def count_all(self) -> int:
+        # Headcount for the admin dashboard — a plain COUNT(*), no rows pulled.
+        return (await self._db.execute(select(func.count()).select_from(Employee))).scalar_one()

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function StatusBadge({ status }) {
+export default function StatusBadge({ status, size = 'text-[10px]' }) {
   const normalizedStatus = (status || '').toLowerCase().trim();
 
   let styles = 'bg-primary/10 text-primary border border-primary/20';
@@ -20,7 +20,7 @@ export default function StatusBadge({ status }) {
   }
 
   return (
-    <span className={`px-3 py-1 rounded-full font-label-sm text-[10px] font-bold uppercase tracking-wider ${styles}`}>
+    <span className={`px-3 py-1 rounded-full font-label-sm ${size} font-bold uppercase tracking-wider ${styles}`}>
       {status}
     </span>
   );

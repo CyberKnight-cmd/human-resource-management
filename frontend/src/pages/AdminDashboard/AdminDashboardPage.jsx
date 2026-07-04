@@ -1,68 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
 import StarRating from '../../components/ui/StarRating';
-import GlassCard from '../../components/ui/GlassCard';
+import { getAdminDashboard } from '../../api/dashboard';
+import { listEmployees } from '../../api/users';
+import { decideRequest } from '../../api/leave';
 
 export default function AdminDashboardPage() {
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      name: "Jordan Smith",
-      email: "jordan.s@aether.co",
-      role: "Senior Architect",
-      status: "Active",
-      performance: 4,
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCf5G6vNXB7ruEHjmTnDpcfgRBPPe7RpZaAj_BagAvzxTZQRMrI398UsrnBsCNIjewofxfVwmKv67g-4PdIInrtQoBBlz4_pzMXLQPqAVdPwp3fL0h6WjNXR9akL9YdyC4G-VfQwKvA11wH-Q_b6mf_zhfiOx0Ol-EhUZGoPBLiOJnXkb-oUIogI0eT7rNfScrv0GYlzJkjga_cACQKfwf1PE2amYsf_JXZUej4M3mKe8qe0g9bNwtr9lN1JLEVRiDeEgrUq3ujXJw"
-    },
-    {
-      id: 2,
-      name: "Elena Rodriguez",
-      email: "elena.r@aether.co",
-      role: "HR Manager",
-      status: "On Leave",
-      performance: 5,
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAEBBa3Q-xbJbH_OwSTZPfC4t35TkZeXa2RMylC9Pzg9uMe9ltL272B8B6re6Tcshsofb2RJibfznMJztnGqyKltQruJgdmesDsWncQKv3G-oR5ImLsXknmcQwNl8N7KsLPLLs759X4YbYWvPc-Pl8KPITcgCWVCI05dhcnOpuupNBaiP6iBkFShMcasi4-NS_f4pEwwJExE2qNeGNe3hMs3X4DVT46SjEVWFPVGM2cBMwk0ZHSK0Av-kFWW0aclSCnhHeni28IElE"
-    },
-    {
-      id: 3,
-      name: "Sarah Chen",
-      email: "sarah.c@aether.co",
-      role: "Product Designer",
-      status: "Active",
-      performance: 4,
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCbobfDQ3VFXDlhLiIUzMNkPs25K5knTr6HkTTwF74beko2DtmjtBG8tv2DVwy91itiiDZxKxsZsFuk6mcDOiX-8xNhGxH1WgenqzEHOjRp8paQObZ094pIpuiy70YuXG0DPJSDF7vGq9r2QeNMV3JpstNx39k7QTA_ZSeDC3Qq8apJm4gi3YlUKVrBtST6Sd6X3WYP2_BIOHbNEB9KKphbThoIhHxr0IW7ObGzEFqSoeFlnnyr7SaMMpj4J1G4VqGUwb--GlxC7_4"
+  const [dashboard, setDashboard] = useState(null);
+  const [employeePage, setEmployeePage] = useState({ items: [], total: 0 });
+  const [decisionError, setDecisionError] = useState('');
+  const [busyRequestId, setBusyRequestId] = useState(null);
+
+  const loadDashboard = useCallback(() => {
+    getAdminDashboard().then(setDashboard).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    loadDashboard();
+    listEmployees(10, 0).then(setEmployeePage).catch(() => {});
+  }, [loadDashboard]);
+
+  const employeesById = useMemo(() => {
+    const map = {};
+    for (const emp of employeePage.items) map[emp.id] = emp;
+    return map;
+  }, [employeePage.items]);
+
+  const attendanceToday = dashboard?.attendance_today || { present: 0, absent: 0, half_day: 0, leave: 0 };
+  const presentPct = dashboard?.total_employees
+    ? Math.round(((attendanceToday.present + attendanceToday.half_day) / dashboard.total_employees) * 100)
+    : 0;
+
+  const handleDecision = async (requestId, status) => {
+    setDecisionError('');
+    setBusyRequestId(requestId);
+    try {
+      await decideRequest(requestId, status, null);
+      loadDashboard();
+    } catch (err) {
+      setDecisionError(err.message || 'Could not record that decision');
+    } finally {
+      setBusyRequestId(null);
     }
-  ]);
-
-  const [leaveRequests, setLeaveRequests] = useState([
-    {
-      id: 1,
-      name: "Mark Thompson",
-      type: "Sick Leave",
-      duration: "2 Days",
-      time: "Today",
-      message: '"Feeling under the weather today, need to take a couple of days off to recover. Projects are handed over."',
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuC_zQSPKE4mDBwI8Y47iH4zPmHyZzbjMzwqdSqPCN82xfPbgoaO2FfrfBZuO95CQv8k9UfuTgeyQP23wFu2v1_-6dblACb-j2KtCTRykwEIqdgUVEmADkjfKELfGsm0LTVR_A7mILqW1_rrT-AIOdZL7gc_k8V0wW4edaXCMlB3B0p94C_SnG-miGYjRS2MR8iNvD_i4w7_WvCLgKQe6Y2fiqQZ0wmPvHtdrbuzQW7Wh-jYAIcvZDu9u29RD_KiNDWlLxVhIygQBic"
-    },
-    {
-      id: 2,
-      name: "Aria Varma",
-      type: "Vacation",
-      duration: "5 Days",
-      time: "12 May",
-      message: '"Family trip planned for next week. All deliverables for the current sprint are on track."',
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBY-QFupQWHs5OLP8N4FkEDP4ylrZSK1Xu_lUg86NuyYjkBCGOQvxGTKfP3OgKbVNUA1VlHVz0qmCLLn78g1uRt66OKG7OZS-0a8RKC5CcLucpS3euNiPkuQwKvOStZzm6UsKdJmnBwU-Z564xnxKg584q3yCMGR6nw6th3ROQXaPRX_rdEXuG475Lsfk9GGHu9eVwKgju7PB15DuTa3byNkS6Ehfltl06ioCt6tT8McenaHMXeAlXqeEKFtTWFUi0wqZmYskw9hFw"
-    }
-  ]);
-
-  const handleApprove = (id) => {
-    setLeaveRequests(prev => prev.filter(req => req.id !== id));
-  };
-
-  const handleReject = (id) => {
-    setLeaveRequests(prev => prev.filter(req => req.id !== id));
   };
 
   return (
@@ -70,7 +51,7 @@ export default function AdminDashboardPage() {
       {/* Dashboard Title */}
       <div className="mb-10 animate-fade-in">
         <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2 tracking-tight">Organization Overview</h2>
-        <p className="text-on-surface-variant max-w-2xl">Real-time organizational insights and operational metrics for AetherCorp.</p>
+        <p className="text-on-surface-variant max-w-2xl">Real-time organizational insights and operational metrics.</p>
       </div>
 
       {/* Bento Stats Grid */}
@@ -78,16 +59,14 @@ export default function AdminDashboardPage() {
         <StatCard
           icon="groups"
           title="Total Employees"
-          value={1248}
-          badgeText="+4%"
-          badgeType="primary"
+          value={dashboard?.total_employees ?? 0}
           delay="0.1s"
         />
         <StatCard
           icon="how_to_reg"
           title="Present Today"
-          value={1142}
-          badgeText="92%"
+          value={attendanceToday.present + attendanceToday.half_day}
+          badgeText={dashboard ? `${presentPct}%` : undefined}
           badgeType="tertiary"
           iconBgColor="bg-tertiary-container/10"
           iconColor="text-tertiary"
@@ -96,12 +75,12 @@ export default function AdminDashboardPage() {
         <StatCard
           icon="event_busy"
           title="Pending Leaves"
-          value={14}
+          value={dashboard?.pending_leave_count ?? 0}
           iconBgColor="bg-secondary-container/20"
           iconColor="text-secondary"
           delay="0.3s"
         />
-        {/* Payroll Status StatCard */}
+        {/* Payroll Status StatCard — no processing-cycle data model on the backend, kept decorative */}
         <div className="glass-card p-6 rounded-3xl stagger-in overflow-hidden relative" style={{ animationDelay: '0.4s' }}>
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -113,7 +92,7 @@ export default function AdminDashboardPage() {
           </div>
           <p className="font-label-sm text-on-surface-variant mb-1 uppercase tracking-widest">Payroll Status</p>
           <h3 className="font-headline-md text-headline-md font-bold text-primary">Processing</h3>
-          <p className="font-label-sm text-on-surface-variant opacity-60 mt-2">Cycle: May 2024</p>
+          <p className="font-label-sm text-on-surface-variant opacity-60 mt-2">Cycle: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
           <div className="absolute bottom-0 left-0 h-1 bg-primary/30 w-full">
             <div className="h-full bg-primary" style={{ width: '65%' }}></div>
           </div>
@@ -127,7 +106,7 @@ export default function AdminDashboardPage() {
           <div className="p-6 border-b border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h3 className="font-headline-md text-headline-md">Active Directory</h3>
-              <p className="font-label-sm text-on-surface-variant">Manage 1,248 global employees</p>
+              <p className="font-label-sm text-on-surface-variant">Manage {employeePage.total.toLocaleString()} employees</p>
             </div>
             <div className="flex items-center gap-2">
               <button className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-on-surface-variant transition-all cursor-pointer">
@@ -152,23 +131,27 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {employees.map(emp => (
+                {employeePage.items.map(emp => (
                   <tr key={emp.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <img className="w-10 h-10 rounded-full border border-white/10 object-cover" src={emp.avatar} alt={emp.name} />
+                        <div className="w-10 h-10 rounded-full border border-white/10 bg-surface-container flex items-center justify-center text-on-surface-variant">
+                          <span className="material-symbols-outlined text-[20px]">person</span>
+                        </div>
                         <div>
-                          <p className="font-label-sm text-on-surface">{emp.name}</p>
-                          <p className="text-[12px] text-on-surface-variant">{emp.email}</p>
+                          <p className="font-label-sm text-on-surface">{emp.first_name} {emp.last_name}</p>
+                          <p className="text-[12px] text-on-surface-variant">{emp.department || 'Unassigned'}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-on-surface-variant font-label-sm">{emp.role}</td>
+                    <td className="px-6 py-4 text-on-surface-variant font-label-sm">{emp.designation || '—'}</td>
                     <td className="px-6 py-4">
-                      <StatusBadge status={emp.status} />
+                      {/* No employment-status field on the backend yet — shown as a decorative default */}
+                      <StatusBadge status="Active" />
                     </td>
                     <td className="px-6 py-4">
-                      <StarRating rating={emp.performance} />
+                      {/* No performance-rating data model on the backend — decorative placeholder */}
+                      <StarRating rating={0} />
                     </td>
                     <td className="px-6 py-4">
                       <button className="text-on-surface-variant hover:text-primary transition-colors bg-transparent border-none cursor-pointer">
@@ -182,7 +165,7 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="p-6 border-t border-white/5 flex justify-between items-center mt-auto">
-            <p className="font-label-sm text-on-surface-variant text-[12px]">Showing 3 of 1,248 employees</p>
+            <p className="font-label-sm text-on-surface-variant text-[12px]">Showing {employeePage.items.length} of {employeePage.total.toLocaleString()} employees</p>
             <div className="flex gap-2">
               <button className="px-3 py-1 rounded-lg border border-white/10 font-label-sm text-label-sm hover:bg-white/5 transition-all disabled:opacity-30 cursor-pointer bg-transparent text-on-surface" disabled>Prev</button>
               <button className="px-3 py-1 rounded-lg border border-white/10 font-label-sm text-label-sm hover:bg-white/5 transition-all cursor-pointer bg-transparent text-on-surface">Next</button>
@@ -194,45 +177,56 @@ export default function AdminDashboardPage() {
         <div className="xl:col-span-4 space-y-gutter stagger-in" style={{ animationDelay: '0.6s' }}>
           <div className="flex justify-between items-center mb-2 px-2">
             <h3 className="font-headline-md text-headline-md text-on-surface">Leave Requests</h3>
-            <a className="font-label-sm text-label-sm text-primary hover:underline" href="#">View All</a>
+            <a className="font-label-sm text-label-sm text-primary hover:underline cursor-pointer" href="#">View All</a>
           </div>
 
-          {leaveRequests.length === 0 ? (
+          {decisionError && <p className="text-error font-body-md text-sm px-2">{decisionError}</p>}
+
+          {!dashboard || dashboard.recent_leave_requests.length === 0 ? (
             <div className="glass-card p-8 rounded-3xl text-center text-on-surface-variant font-body-md">
               No pending leave requests.
             </div>
           ) : (
-            leaveRequests.map(req => (
-              <div key={req.id} className="glass-card p-5 rounded-3xl relative group overflow-hidden transition-all duration-300">
-                <div className="flex gap-4 mb-4">
-                  <img className="w-12 h-12 rounded-2xl border border-white/10 object-cover" src={req.avatar} alt={req.name} />
-                  <div>
-                    <h4 className="font-label-sm text-on-surface">{req.name}</h4>
-                    <p className="text-[12px] text-on-surface-variant">{req.type} • {req.duration}</p>
+            dashboard.recent_leave_requests.map(req => {
+              const employee = employeesById[req.employee_id];
+              const name = employee ? `${employee.first_name} ${employee.last_name}` : 'Unknown Employee';
+              const typeLabel = req.leave_type.charAt(0).toUpperCase() + req.leave_type.slice(1);
+              return (
+                <div key={req.id} className="glass-card p-5 rounded-3xl relative group overflow-hidden transition-all duration-300">
+                  <div className="flex gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-2xl border border-white/10 bg-surface-container flex items-center justify-center text-on-surface-variant">
+                      <span className="material-symbols-outlined">person</span>
+                    </div>
+                    <div>
+                      <h4 className="font-label-sm text-on-surface">{name}</h4>
+                      <p className="text-[12px] text-on-surface-variant">{typeLabel} Leave • {req.days_count} Day{req.days_count === 1 ? '' : 's'}</p>
+                    </div>
+                    <div className="ml-auto text-right">
+                      <p className="text-[10px] text-on-surface-variant uppercase">From {req.start_date}</p>
+                    </div>
                   </div>
-                  <div className="ml-auto text-right">
-                    <p className="text-[10px] text-on-surface-variant uppercase">{req.time}</p>
+                  <p className="text-body-md text-[14px] text-on-surface-variant mb-6 leading-relaxed">
+                    {req.remarks || 'No additional remarks.'}
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => handleDecision(req.id, 'rejected')}
+                      disabled={busyRequestId === req.id}
+                      className="py-2.5 rounded-xl border border-error/30 text-error font-bold font-label-sm text-label-sm hover:bg-error/10 active:scale-95 transition-all cursor-pointer bg-transparent disabled:opacity-50"
+                    >
+                      Reject
+                    </button>
+                    <button
+                      onClick={() => handleDecision(req.id, 'approved')}
+                      disabled={busyRequestId === req.id}
+                      className="py-2.5 rounded-xl bg-primary text-on-primary font-bold font-label-sm text-label-sm hover:shadow-[0_0_15px_rgba(104,218,185,0.4)] active:scale-95 transition-all cursor-pointer border-none disabled:opacity-50"
+                    >
+                      Approve
+                    </button>
                   </div>
                 </div>
-                <p className="text-body-md text-[14px] text-on-surface-variant mb-6 leading-relaxed">
-                  {req.message}
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => handleReject(req.id)}
-                    className="py-2.5 rounded-xl border border-error/30 text-error font-bold font-label-sm text-label-sm hover:bg-error/10 active:scale-95 transition-all cursor-pointer bg-transparent"
-                  >
-                    Reject
-                  </button>
-                  <button 
-                    onClick={() => handleApprove(req.id)}
-                    className="py-2.5 rounded-xl bg-primary text-on-primary font-bold font-label-sm text-label-sm hover:shadow-[0_0_15px_rgba(104,218,185,0.4)] active:scale-95 transition-all cursor-pointer border-none"
-                  >
-                    Approve
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

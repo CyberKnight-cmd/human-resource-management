@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.enums import Role
+from app.common.pagination import Page
 from app.core.dependencies import get_current_user, require_role
 from app.db.session import get_db
 from app.models.user import User
@@ -23,7 +24,7 @@ async def update_me(data: EmployeeSelfUpdate, current_user: User = Depends(get_c
     return await service.update_own_profile(db, current_user, data)
 
 
-@router.get("", dependencies=[Depends(require_role(Role.ADMIN))])
+@router.get("", response_model=Page[EmployeeOut], dependencies=[Depends(require_role(Role.ADMIN))])
 async def list_employees(limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)):
     return await service.admin_list_employees(db, limit, offset)
 
