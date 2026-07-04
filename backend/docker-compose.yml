@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hrms
+      POSTGRES_PASSWORD: hrms
+      POSTGRES_DB: hrms
+    ports:
+      - "5432:5432"
+    volumes:
+      - hrms_pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/srv
+
+volumes:
+  hrms_pgdata:

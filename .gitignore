@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Env
+.env
+backend/.env
+
+# Uploads (keep the folder, not its contents)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Alembic generated migrations are checked in, but keep the dir tracked even if empty
+!backend/alembic/versions/.gitkeep
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.idea/
+.vscode/
