@@ -12,7 +12,9 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://hrms:hrms@localhost:5432/hrms"
+    # Emergency default: a local SQLite file, so the app runs with zero DB setup
+    # (no server, no docker). Point this at postgresql+asyncpg://... in real deployments.
+    DATABASE_URL: str = "sqlite+aiosqlite:///./hrms.db"
 
     # JWT — separate secrets so a leaked access secret can't mint refresh tokens
     JWT_ACCESS_SECRET: str = "change-me-access-secret"

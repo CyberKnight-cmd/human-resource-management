@@ -5,7 +5,7 @@
 <br/>
 
 ![Status](https://img.shields.io/badge/status-scaffold--in--progress-2FA98A?style=flat-square)
-![Python](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/python-3.12%2B-3776AB?style=flat-square&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688?style=flat-square&logo=fastapi&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0%20async-CC2927?style=flat-square)
@@ -57,7 +57,7 @@ HR operations at most small-to-mid orgs are scattered across spreadsheets, chat 
 Layered, module-per-feature backend — routers never touch the database directly, and every layer only talks to the one beneath it:
 
 ```
-Router  →  Service  →  Repository  →  SQLAlchemy Model  →  PostgreSQL
+Router  →  Service  →  Repository  →  SQLAlchemy Model  →  SQLite (dev) / PostgreSQL (prod)
  (HTTP)     (rules)      (queries)        (schema)
 ```
 
@@ -77,9 +77,10 @@ Full design docs live in [`Architecture/`](Architecture):
 
 | Layer | Choice |
 |---|---|
-| API framework | FastAPI (async), Python 3.11+ |
+| API framework | FastAPI (async), Python 3.12+ |
 | ORM / migrations | SQLAlchemy 2.0 (async) + Alembic |
-| Database | PostgreSQL |
+| Database | SQLite by default for local dev (zero setup) · PostgreSQL in production |
+| Package/project manager | [uv](https://docs.astral.sh/uv/) — `pyproject.toml` + `uv.lock` |
 | Auth | JWT (`python-jose`) — short-lived access token, rotating/revocable refresh token — `passlib[bcrypt]` for hashing |
 | Validation | Pydantic v2 |
 | Containerization | Docker + Docker Compose |
@@ -103,18 +104,36 @@ Full design docs live in [`Architecture/`](Architecture):
 
 ## Getting Started
 
+**Prerequisite:** [uv](https://docs.astral.sh/uv/) — a fast Python package/project manager. Install it once per machine:
+
 ```bash
-cd backend
-cp .env.example .env            # fill in real secrets before anything but local dev
-pip install -r requirements.txt
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-docker-compose up -d db         # Postgres only; use `docker-compose up` to also run the API in a container
-alembic upgrade head             # once the first migration exists
-
-uvicorn app.main:app --reload   # http://localhost:8000/docs for the live API contract
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-`/health` is a plain liveness check; `/docs` is the interactive Swagger UI and doubles as the contract between backend and frontend during the hackathon.
+Then, from a fresh clone:
+
+```bash
+git clone https://github.com/CyberKnight-cmd/human-resource-management.git
+cd human-resource-management/backend
+
+cp .env.example .env            # defaults already work for local dev — edit only if you need real secrets
+uv sync --group dev             # creates backend/.venv and installs everything pinned in uv.lock
+                                 # (uv also fetches the right Python version automatically if you don't have one)
+
+uv run uvicorn app.main:app --reload   # → http://localhost:8000/docs
+```
+
+That's the whole setup — **no database server, no Docker, no manual Python/venv install required.** `.env.example` defaults `DATABASE_URL` to a local SQLite file (`backend/hrms.db`), and the app creates all tables from the models on first startup. The file is created automatically the first time you run the server.
+
+- API docs (Swagger UI): http://localhost:8000/docs
+- Liveness check: http://localhost:8000/health
+- Run the test suite: `uv run pytest`
+
+To switch to real Postgres later: uncomment the `postgresql+asyncpg://...` line in `.env`, then `docker-compose up -d db` and `alembic upgrade head` once migrations exist.
 
 ## Roadmap
 
