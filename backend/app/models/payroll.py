@@ -16,6 +16,9 @@ class SalaryStructure(UUIDPKMixin, TimestampMixin, Base):
 
     __tablename__ = "salary_structures"
 
+    # No currency column on purpose — this HRMS runs single-currency (INR), so it's a
+    # constant baked into the API schema, not something every row needs to repeat.
+    # Numeric(12, 2) gives paise precision up to ~999 crore, which should outlive the hackathon.
     employee_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("employees.id"), index=True)
     basic_pay: Mapped[float] = mapped_column(Numeric(12, 2))
     hra: Mapped[float] = mapped_column(Numeric(12, 2), default=0)
