@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import date, timedelta
 
 from sqlalchemy import func, select
 
@@ -76,3 +76,19 @@ class AttendanceRepository(BaseRepository[AttendanceRecord]):
         counts = {status: 0 for status in AttendanceStatus}
         counts.update(dict(rows))
         return counts
+
+    async def mark_range_as_leave(self, employee_id: uuid.UUID, start_date: date, end_date: date) -> None:
+        """Called by Leave the moment a request gets approved — every day in the range
+        becomes an attendance row with status=LEAVE, overwriting whatever was there
+        before (approved leave wins over a stray PRESENT). This is the one place
+        outside Attendance's own service that's allowed to touch attendance_records
+        directly, which is exactly why it lives here and not duplicated in Leave."""
+        current = start_date
+        while current <= end_date:
+            record = await self.get_for_date(employee_id, current)
+            if record is None:
+                record = AttendanceRecord(employee_id=employee_id, date=current, status=AttendanceStatus.LEAVE)
+            else:
+                record.status = AttendanceStatus.LEAVE
+            await self.add(record)
+            current += timedelta(days=1)
