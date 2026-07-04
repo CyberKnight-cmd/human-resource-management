@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="HRMS — Human Resource Management System" width="100%" />
+<img src="docs/assets/banner.png" alt="HRMS — Human Resource Management System" width="100%" />
 
 <br/>
 
