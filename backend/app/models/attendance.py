@@ -14,7 +14,10 @@ class AttendanceRecord(UUIDPKMixin, TimestampMixin, Base):
     # so even a buggy service call can't accidentally clone someone's Tuesday.
     __table_args__ = (UniqueConstraint("employee_id", "date", name="uq_attendance_employee_date"),)
 
-    employee_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("employees.id"), index=True)
+    # No standalone index here — the (employee_id, date) unique constraint below already
+    # gives us a composite index with employee_id as its leftmost column, which covers
+    # employee_id-only lookups too. A separate index would just be dead weight on every insert.
+    employee_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("employees.id"))
     date: Mapped[date] = mapped_column(Date, index=True)
     check_in_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     check_out_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
